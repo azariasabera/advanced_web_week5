@@ -5,7 +5,7 @@ var router = express.Router();
 const mongoose = require('mongoose');
 const Recipe = require("../models/Recipe");
 
-const mongoDB = 'mongodb://0.0.0.0:27017/recipedb';
+const mongoDB = 'mongodb://127.0.0.1:27017/testdb';
 mongoose.connect(mongoDB)
         .then(() => console.log("Nani, MongoDB is connected!"))
         .catch((error) => console.log(` Nani, Error has occured: ${error}`));
