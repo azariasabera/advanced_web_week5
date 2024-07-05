@@ -13,13 +13,19 @@ let form = document.getElementById('recipe-form');
 
 let instructionList = [];
 let ingredientList = [];
+let categoryList = [];
+
+let categories = [];
+let catagoryData = []; // to store all category info including id
 
 addButton.addEventListener('click', ()=>{
+    checkCategory(); // checks which categories are checked
     let name = nameToAdd.value;
     let recipe = {
         name: name,
         ingredients: ingredientList,
-        instructions: instructionList
+        instructions: instructionList,
+        categories: categoryList
     };
 
     try {
@@ -136,19 +142,56 @@ searchButton.addEventListener('keyup', (e) => {
     }
 });
 
-/*
-Code  11-26 can be written using async:
-  try {
-    const response = await fetch("/recipe/" + name);
-    if (!response.ok) {
-      throw new Error("Food not found");
+function fetchCategory(){
+    try {
+        fetch("/categories")
+        .then(response => response.json())
+        .then(data => {
+            catagoryData = data;
+            data.forEach(category => {
+                categories.push(category.name);
+            });
+            return createCategoryElements();
+        });
     }
-    const data = await response.json();
-    createElements(data);
-  } catch (error) {
-    console.error(error.message); // This will log only your custom error message
-  }
-});
+    catch (error) {
+        console.log('error is, nani,' + error);
+    }
+}
 
-in this way i wont see the 404 error in the console!
-*/
+function createCategoryElements(){
+    let fieldSet = document.getElementById('category-fieldset');
+    let legend = document.createElement('legend');
+    legend.textContent = 'Categories';
+    fieldSet.appendChild(legend);
+    
+    categories.sort();
+    categories.forEach(category => {
+        let p = document.createElement('p');
+        let label = document.createElement('label');
+        let input = document.createElement('input');
+        input.type = 'checkbox';
+        input.name = 'category';
+        input.value = category;
+        let span = document.createElement('span');
+        span.textContent = category;
+        label.appendChild(input);
+        label.appendChild(span);
+        p.appendChild(label);
+        p.appendChild(document.createElement('br'));
+        fieldSet.appendChild(p);
+    });
+}
+
+function checkCategory(){
+    let checkboxes = document.querySelectorAll('input[name="category"]:checked');
+    // It also worked as input[type="checkbox"] but name is more specific
+
+    checkboxes.forEach(checkbox => {
+        let name = checkbox.value;
+        let id = catagoryData.find(category => category.name === name)._id;
+        categoryList.push(id);
+    });
+}
+
+fetchCategory();

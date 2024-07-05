@@ -4,6 +4,7 @@ var router = express.Router();
 // =================== mongoDB setup ===================
 const mongoose = require('mongoose');
 const Recipe = require("../models/Recipe");
+const Category = require("../models/Category");
 
 const mongoDB = 'mongodb://127.0.0.1:27017/testdb';
 mongoose.connect(mongoDB)
@@ -47,7 +48,6 @@ function initializeRecipes(){
         });
 }
 
-initializeRecipes();
 // -----------------------------------------------------------
 
 router.get("/recipe/:food", (req, res)=>{
@@ -83,7 +83,8 @@ router.post("/recipe/", (req, res)=>{
             let newRecipe = new Recipe({
               instructions: req.body.instructions,
               ingredients: req.body.ingredients,
-              name: req.body.name
+              name: req.body.name,
+              categories: req.body.categories
             });
             newRecipe.save();
             res.json(req.body);
@@ -97,5 +98,38 @@ router.post("/recipe/", (req, res)=>{
 router.post("/images", (req, res) => {
   res.json({msg: "Image uploaded"});
 });
+
+
+function generateCategories(catagory){
+  Category.findOne({name: catagory})
+          .then((category) => {
+            if(!category){
+              let newCategory = new Category({
+                name: catagory
+              });
+              newCategory.save();
+            }
+          })
+          .catch((error) => {
+            console.log(`Error occured: ${error}!!!`);
+          });
+}
+
+router.get("/categories", (req, res) => {
+  Category.find()
+          .then((categories) => {
+            res.json(categories);
+          })
+          .catch((error) => {
+            res.status(500).json({msg: `Error occured: ${error}!!!`});
+          });
+});
+
+let categories = ["Gluten-Free", "vegan", "Ovo"];
+categories.forEach((category) => {
+  generateCategories(category);
+});
+
+initializeRecipes();
 
 module.exports = router;

@@ -4,6 +4,7 @@ const RecipeSchema = new Schema({
     instructions: Array,
     ingredients: Array,
     name: String,
+    categories: Array
 },
 //{ collection: "Recipes"} // explicitly specifying the collection name
 );

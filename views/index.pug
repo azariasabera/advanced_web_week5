@@ -29,8 +29,25 @@ block content
       br
       button#add-instruction(class="btn") Add instruction
       br
-      form(action="" method="post" id="recipe-form" enctype="multipart/form-data")  
+      form(action="" method="post" id="recipe-form" enctype="multipart/form-data") 
+        br 
         input#image-input(type="file" accept="image/*" multiple="true" capture="camera") 
+        br
+        br
+        fieldset#category-fieldset
+          //legend Categories
+          //p
+            label
+              input(type="checkbox" name="category" value="Gluten-Free")
+              span Gluten-Free
+            br
+            label
+              input(type="checkbox" name="category" value="Vegan")
+              span Vegan
+            br
+            label
+              input(type="checkbox" name="category" value="Ovo")
+              span Ovo
         br
         button#submit(type="submit" class="btn")  Submit
       
