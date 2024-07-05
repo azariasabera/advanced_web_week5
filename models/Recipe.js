@@ -5,7 +5,7 @@ const RecipeSchema = new Schema({
     ingredients: Array,
     name: String,
 },
-{ collection: "Recipes"} // explicitly specifying the collection name
+//{ collection: "Recipes"} // explicitly specifying the collection name
 );
 
 module.exports = mongoose.model("Recipe", RecipeSchema);
