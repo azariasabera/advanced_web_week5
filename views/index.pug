@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  //h1= title
+  //p Welcome to #{title}
+
+  nav(class="pink darken-2")
+    div(class="nav-wrapper")
+      a(href="#!" class="brand-logo left") Recipes
+      input(type="search" id="search" placeholder="Search a recipe" class="right")
+
+  
+  div(class="container")      
+    div#displayDiv(class="col")
+    br
+    hr#hr
+    br
+    div#addDiv(class="col")
+      p Name
+      input(type="text" id="name-text" placeholder="Enter food name")
+      h4 Ingredients 
+      textarea#ingredients-text(name="") 
+      br
+      button#add-ingredient(class="btn") Add ingredient
+      br
+      br
+      h4 Instructions 
+      textarea#instructions-text(name="")
+      br
+      button#add-instruction(class="btn") Add instruction
+      br
+      form(action="" method="post" id="recipe-form" enctype="multipart/form-data")  
+        input#image-input(type="file" accept="image/*" multiple="true" capture="camera") 
+        br
+        button#submit(type="submit" class="btn")  Submit
+      
