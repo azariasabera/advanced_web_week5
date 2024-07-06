@@ -67,7 +67,9 @@ router.get("/recipe/:food", (req, res)=>{
             let defaultResponse = { 
               name: req.params.food,
               instructions: ["Default instructions"],
-              ingredients: ["Default ingredients"]
+              ingredients: ["Default ingredients"],
+              categories: ["Default categories"],
+              images: []
             };
             res.json(defaultResponse);
           }
@@ -145,6 +147,22 @@ router.get("/categories", (req, res) => {
             res.status(500).json({msg: `Error occured: ${error}!!!`});
           });
 });
+
+router.get("/images/:imageId", (req, res) => {
+    Image.findById(req.params.imageId)
+        .then((image) => {
+            if(image){
+              res.setHeader('Content-Type', image.mimetype);
+              res.setHeader('Content-Disposition', 'inline');
+                res.send(image.buffer);
+            } else {
+                res.status(404).send("Image not found!");
+            }
+        })
+        .catch((error) => {
+            res.status(500).send(`Error occured: ${error}!!!`);
+        });
+  });
 
 let categories = ["Gluten-Free", "vegan", "Ovo"];
 categories.forEach((category) => {

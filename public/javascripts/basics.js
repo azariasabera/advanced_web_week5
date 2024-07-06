@@ -1,6 +1,4 @@
 let nameToAdd = document.getElementById('name-text');
-nameToAdd.value = 'Pizza'; // default value for Task 2
-
 let ingredientInput = document.getElementById('ingredients-text');
 let instructionInput = document.getElementById('instructions-text');
 
@@ -11,6 +9,8 @@ let addInstruction = document.getElementById('add-instruction');
 
 let imageInput = document.getElementById('image-input');
 let form = document.getElementById('recipe-form');
+
+let imageDiv = document.getElementById('images');
 
 let instructionList = [];
 let ingredientList = [];
@@ -76,16 +76,18 @@ addInstruction.addEventListener('click', ()=>{
     instructionList.push(instruction);
 });
 
-function fetchData(){
-    const name = nameToAdd.value; 
+function fetchData(name){
+    instructionList = [];
+    ingredientList = [];
+    categoryList = [];
     fetch("/recipe/" + name)
     .then(response => {
         return response.json();  
     })
     // or simply .then(response => response.json())
     .then(data => {
+        displayImages(data.images); // to display images
         createElements(data);
-        fetchCategory();
     })
     .catch(error => {
         console.log(error)
@@ -127,8 +129,7 @@ function createElements(data){
 
 searchButton.addEventListener('keyup', (e) => {
     if(e.keyCode === 13){
-        nameToAdd.value = searchButton.value;
-        fetchData();
+        fetchData(searchButton.value);
     }
 });
 
@@ -184,4 +185,33 @@ function checkCategory(){
     });
 }
 
-fetchData();
+function displayImages(imageIDs){
+    if(imageIDs.length === 0){
+        console.log('No images found for: ' + searchButton.value);
+        return;
+    };
+    
+    imageIDs.forEach(imageID => {
+        fetch("/images/" + imageID)
+        .then(response => response.blob())
+        .then(blob => {
+            let img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);
+            img.width = 200;
+            img.height = 200;
+            imageDiv.appendChild(img);
+        });
+    });
+
+    /* images.forEach(image => {
+        console.log(image.originalname)
+        let img = document.createElement('img');
+        img.src = 'data:' + image.mimetype + ';base64,' + image.buffer.toString('base64');
+        img.width = 200;
+        img.height = 200;
+        imageDiv.appendChild(img);
+    }); */
+}
+
+fetchData('Pizza');
+fetchCategory();
