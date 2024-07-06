@@ -4,6 +4,7 @@ nameToAdd.value = 'Pizza'; // default value for Task 2
 let ingredientInput = document.getElementById('ingredients-text');
 let instructionInput = document.getElementById('instructions-text');
 
+let searchButton = document.getElementById('search');
 let addButton = document.getElementById('submit');
 let addIngredient = document.getElementById('add-ingredient');
 let addInstruction = document.getElementById('add-instruction');
@@ -13,75 +14,66 @@ let form = document.getElementById('recipe-form');
 
 let instructionList = [];
 let ingredientList = [];
+
 let categoryList = [];
-
 let categories = [];
-let catagoryData = []; // to store all category info including id
+let catagoryData = []; // to store all category info including id (one we get from the db)
 
-addButton.addEventListener('click', ()=>{
-    checkCategory(); // checks which categories are checked
-    let name = nameToAdd.value;
-    let recipe = {
-        name: name,
-        ingredients: ingredientList,
-        instructions: instructionList,
-        categories: categoryList
-    };
+form.addEventListener('submit', (e) => {
+ 
+    e.preventDefault();
 
-    try {
-        fetch("/recipe/", {
+    let formData = new FormData(e.target);
+
+    fetch("/images", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        // I will implement what addButton.addEventListener does here
+        checkCategory(); // checks which categories are checked
+        let name = nameToAdd.value;
+        let recipe = {
+            name: name,
+            ingredients: ingredientList,
+            instructions: instructionList,
+            categories: categoryList,
+            images: data // one we received from the server
+        };
+
+        return fetch("/recipe/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(recipe)
         })
-        .then(response => {
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             createElements(data);
             console.log(data);
             instructionList = [];
             ingredientList = [];
-        })}
-    catch (error) {
-        console.log('error');
-    }
-});
-
-form.addEventListener('submit', (e) => {
- 
-    e.preventDefault();
-    const formData = new FormData(form);
-    
-    // Wrapping the images in a FormData object and Fetching the images
-    for (let i = 0; i < imageInput.files.length; i++) {
-        formData.append('images', imageInput.files[i]);
-        console.log(imageInput.files[i]);
-    }
-
-    fetch("/images", {
-        method: "POST",
-        body: formData
+        })
+        .catch(error => {
+            console.log('Error with inside fetch:', error);
+        });
     })
-    .then(response => response.text())
-    .then(data => {
-        console.log(data);
-        fetchData();
-    });
+    .catch(error => {
+        console.log('Error with outside fetch:', error);        
+})
 });
 
 addIngredient.addEventListener('click', ()=>{
     let ingredient = ingredientInput.value;
     ingredientList.push(ingredient);
-    console.log(ingredientList);
 });
 
 addInstruction.addEventListener('click', ()=>{
     let instruction = instructionInput.value;
     instructionList.push(instruction);
-    console.log(instructionList);
 });
 
 function fetchData(){
@@ -93,6 +85,7 @@ function fetchData(){
     // or simply .then(response => response.json())
     .then(data => {
         createElements(data);
+        fetchCategory();
     })
     .catch(error => {
         console.log(error)
@@ -132,9 +125,6 @@ function createElements(data){
     displayDiv.appendChild(ol2);
 };
 
-fetchData();
-
-let searchButton = document.getElementById('search');
 searchButton.addEventListener('keyup', (e) => {
     if(e.keyCode === 13){
         nameToAdd.value = searchButton.value;
@@ -194,4 +184,4 @@ function checkCategory(){
     });
 }
 
-fetchCategory();
+fetchData();

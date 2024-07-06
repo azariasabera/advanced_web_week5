@@ -1,15 +1,11 @@
 extends layout
 
 block content
-  //h1= title
-  //p Welcome to #{title}
-
   nav(class="pink darken-2")
     div(class="nav-wrapper")
       a(href="#!" class="brand-logo left") Recipes
       input(type="search" id="search" placeholder="Search a recipe" class="right")
 
-  
   div(class="container")      
     div#displayDiv(class="col")
     br
@@ -29,14 +25,23 @@ block content
       br
       button#add-instruction(class="btn") Add instruction
       br
-      form(action="" method="post" id="recipe-form" enctype="multipart/form-data") 
+      form(action="/images" method="post" id="recipe-form" enctype="multipart/form-data") 
         br 
-        input#image-input(type="file" accept="image/*" multiple="true" capture="camera") 
+        input#image-input(type="file" accept="image/*" name='images' multiple capture="camera") 
         br
         br
         fieldset#category-fieldset
-          //legend Categories
-          //p
+        br
+        button#submit(type="submit" class="btn")  Submit
+
+
+
+
+
+
+        //fieldset#category-fieldset
+          legend Categories
+          p
             label
               input(type="checkbox" name="category" value="Gluten-Free")
               span Gluten-Free
@@ -47,7 +52,4 @@ block content
             br
             label
               input(type="checkbox" name="category" value="Ovo")
-              span Ovo
-        br
-        button#submit(type="submit" class="btn")  Submit
-      
+              span

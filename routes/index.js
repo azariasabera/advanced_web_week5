@@ -1,10 +1,17 @@
 var express = require('express');
 var router = express.Router();
+const multer = require('multer');
+
+// =================== multer setup ===================
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
+// =====================================================
 
 // =================== mongoDB setup ===================
 const mongoose = require('mongoose');
 const Recipe = require("../models/Recipe");
 const Category = require("../models/Category");
+const Image = require("../models/Image");
 
 const mongoDB = 'mongodb://127.0.0.1:27017/testdb';
 mongoose.connect(mongoDB)
@@ -84,7 +91,8 @@ router.post("/recipe/", (req, res)=>{
               instructions: req.body.instructions,
               ingredients: req.body.ingredients,
               name: req.body.name,
-              categories: req.body.categories
+              categories: req.body.categories,
+              images: req.body.images
             });
             newRecipe.save();
             res.json(req.body);
@@ -95,10 +103,23 @@ router.post("/recipe/", (req, res)=>{
         });
 });
 
-router.post("/images", (req, res) => {
-  res.json({msg: "Image uploaded"});
-});
+router.post("/images", upload.array('images', 10), (req, res) => {
+  let imagesToSend = []; // I will send the image objects to the client.
 
+  // I will save the images to the database collection 'images'
+  let images = req.files;
+  images.forEach((image) => {
+    let newImage = new Image({
+      buffer: image.buffer,
+      mimetype: image.mimetype,
+      name: image.originalname,
+      encoding: image.encoding
+    });
+    newImage.save();
+    imagesToSend.push(newImage._id);
+  });
+  res.json(imagesToSend);
+});
 
 function generateCategories(catagory){
   Category.findOne({name: catagory})
@@ -118,7 +139,7 @@ function generateCategories(catagory){
 router.get("/categories", (req, res) => {
   Category.find()
           .then((categories) => {
-            res.json(categories);
+            res.json(categories); // this sends all categories in the db to the client.
           })
           .catch((error) => {
             res.status(500).json({msg: `Error occured: ${error}!!!`});
@@ -128,7 +149,7 @@ router.get("/categories", (req, res) => {
 let categories = ["Gluten-Free", "vegan", "Ovo"];
 categories.forEach((category) => {
   generateCategories(category);
-});
+}); // this is done when the server starts
 
 initializeRecipes();
 
